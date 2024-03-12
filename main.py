@@ -93,7 +93,7 @@ class Game:
                 self.computer -= 1
         else:
             if self.symbols[start:end] == ['O', 'O']:
-                self.human += 1
+                self.human += 2
             else:
                 self.computer -= 1
 
@@ -117,7 +117,7 @@ class Game:
         kartas_nr1 = int(self.entry2.get())-1
         kartas_nr2 = int(self.entry3.get())-1
 
-        if kartas_nr1 > 0 and kartas_nr1 < len(self.symbols_array) and kartas_nr2 > 0 and kartas_nr2 < len(self.symbols_array):
+        if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array) and kartas_nr2 >= 0 and kartas_nr2 < len(self.symbols_array):
             if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X' or self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O' or self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'X':
                 if abs(kartas_nr1 - kartas_nr2) == 1:
                     self.symbols_array[kartas_nr1] = 'O'
@@ -130,11 +130,11 @@ class Game:
                     self.entry2.delete(0, tk.END)
                     self.entry3.delete(0, tk.END)
                 else:
-                    self.result_label.configure(text="error")
+                    self.result_label.configure(text="error1")
             else:
-                self.result_label.configure(text="error")
+                self.result_label.configure(text="error2")
         else:
-            self.result_label.configure(text="error")
+            self.result_label.configure(text="error3")
 
 
         
