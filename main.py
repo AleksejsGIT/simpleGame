@@ -25,15 +25,24 @@ class Game:
         self.input_label = tk.Label(self.root, text="Enter a number between 15 and 25:")
         self.input_label.configure(bg="#B5C2B7")
         self.input_label.pack()
-        self.result_label = tk.Label(self.root, text="", font=("Arial",14))
-        self.result_label.configure(bg="#B5C2B7")
-        self.result_label.pack()
         self.generate_button = tk.Button(self.root, text="Generate", command=self.generate_and_display)
         self.generate_button.configure(bg="#2D2327", fg="#B5C2B7")
         self.generate_button.pack()
+        self.result_label = tk.Label(self.root, text="", font=("Arial",14))
+        self.result_label.configure(bg="#B5C2B7")
+        self.result_label.pack()
+
+        self.human_label = tk.Label(self.root, text="Human has " + str(self.human) + " points")
+        self.human_label.configure(bg="#B5C2B7")
+        self.human_label.pack()
+
+        self.computer_label = tk.Label(self.root, text="Computer has " + str(self.computer) + " points")
+        self.computer_label.configure(bg="#B5C2B7")
+        self.computer_label.pack()
 
         #papildus ievade gājieniem tad, ja sanāk ģenerēt virkni
         self.papildus_lauki = []
+
 
 
 
@@ -77,27 +86,27 @@ class Game:
 
 
 
-    def make_move(self, player, start, end, new_symbol):
+    def points_result(self, kartas_nr1, kartas_nr2):
         # Pārbaudīt, vai gājiens ir derīgs
-        if self.symbols[start:end] not in [['X', 'X'], ['O', 'O'], ['X', 'O'], ['O', 'X']]:
+        if self.symbols_array[kartas_nr1-1] == self.symbols_array[kartas_nr2-1]:
             return False
 
-        # Veikt gājienu
-        self.symbols[start:end] = [new_symbol]
+        # Rēķināt punktus
+        if self.symbols_array[kartas_nr1-1] == 'X' and self.symbols_array[kartas_nr2-1] == 'X':
+            self.human += 2
+        elif self.symbols_array[kartas_nr1-1] == 'X' and self.symbols_array[kartas_nr2-1] == 'O':
+            self.computer -= 1
+        elif self.symbols_array[kartas_nr1-1] == 'O' and self.symbols_array[kartas_nr2-1] == 'O':
+            self.computer += 2
+        elif self.symbols_array[kartas_nr1-1] == 'O' and self.symbols_array[kartas_nr2-1] == 'X':
+            self.human -= 1
 
-        # Aprēķināt punktus
-        if new_symbol == 'O':
-            if self.symbols[start:end] == ['X', 'X']:
-                self.human += 2
-            else:
-                self.computer -= 1
-        else:
-            if self.symbols[start:end] == ['O', 'O']:
-                self.human += 2
-            else:
-                self.computer -= 1
 
         return True
+    
+    def update_points(self):
+        self.human_label.configure(text="Human has " + str(self.human) + " points")
+        self.computer_label.configure(text="Computer has " + str(self.computer) + " points")
 
     def get_human_move(self, player):
         # kods, kas iegūst gājienu no spēlētāja human(no grafiskas saskarnes)
@@ -118,13 +127,15 @@ class Game:
         kartas_nr2 = int(self.entry3.get())-1
 
         if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array) and kartas_nr2 >= 0 and kartas_nr2 < len(self.symbols_array):
-            if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X' or self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O' or self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'X':
+            if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X' or self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O':
                 if abs(kartas_nr1 - kartas_nr2) == 1:
                     self.symbols_array[kartas_nr1] = 'O'
                     del self.symbols_array[kartas_nr2]
 
                     next_string = ''.join(self.symbols_array)
                     self.result_label.configure(text="New string: " + next_string)
+
+                    self.points_result(kartas_nr1, kartas_nr2) #izsauc metodi, kas aprēķina spēlētāju punktus
 
                     #notīra ievades laukus
                     self.entry2.delete(0, tk.END)
@@ -146,18 +157,15 @@ class Game:
 
     # def minimax(self):...
 
-
     def play(self):
-        # while not self.is_over(): ...
+        #while not self.is_over(): ...
         self.root.mainloop()
-
 
 
 
     # Run the game
 game = Game(20)
 game.play()
-
 
 
 
