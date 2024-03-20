@@ -82,13 +82,13 @@ class Game:
             return False
 
         # Rēķināt punktus
-        if self.symbols_array[kartas_nr1 - 1] == 'X' and self.symbols_array[kartas_nr2 - 1] == 'X':
+        if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X':
             self.human += 2
-        elif self.symbols_array[kartas_nr1 - 1] == 'X' and self.symbols_array[kartas_nr2 - 1] == 'O':
+        elif self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O':
             self.computer -= 1
-        elif self.symbols_array[kartas_nr1 - 1] == 'O' and self.symbols_array[kartas_nr2 - 1] == 'O':
+        elif self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'O':
             self.computer += 2
-        elif self.symbols_array[kartas_nr1 - 1] == 'O' and self.symbols_array[kartas_nr2 - 1] == 'X':
+        elif self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'X':
             self.human -= 1
 
             return True
@@ -117,6 +117,8 @@ class Game:
 
         if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array) and kartas_nr2 >= 0 and kartas_nr2 < len(self.symbols_array) and abs(kartas_nr1 - kartas_nr2) == 1:
             if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X' or self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O':
+                    
+                    self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
 
                     self.symbols_array[kartas_nr1] = 'O'
                     del self.symbols_array[kartas_nr2]
@@ -124,18 +126,18 @@ class Game:
                     next_string = ''.join(self.symbols_array)
                     self.result_label.configure(text="New string: " + next_string)
 
-                    self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
 
                     self.update_points() # Lai rāda, cik katram punktu, vienmēr
 
                     # notīra ievades laukus
                     self.entry2.delete(0, tk.END)
                     self.entry3.delete(0, tk.END)
-            else:
-                self.result_label.configure(text="error")
+    
             
 
-            if self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'O' or self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'X':
+            elif self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'O' or self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'X':
+                    
+                    self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
 
                     self.symbols_array[kartas_nr1] = 'X'
                     del self.symbols_array[kartas_nr2]
@@ -143,7 +145,7 @@ class Game:
                     next_string = ''.join(self.symbols_array)
                     self.result_label.configure(text="New string: " + next_string)
 
-                    self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
+                    
 
                     self.update_points()
 
