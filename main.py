@@ -5,14 +5,8 @@ import random
 class Game:
 
     def __init__(self, length):
-        self.symbols = ""
-        for _ in range(length):
-            if random.random() < 0.5:  # 50% chance for X, 50% chance for O
-                self.symbols += "X"
-            else:
-                self.symbols += "O"
-
-        # self.symbols = [random.choice(['X', 'O']) for _ in range(user_input)] #varēja izdarīt arī tā
+        # Samazināju koda izmēru, lai īsāk un tas pats, saprotami (Alex)
+        self.symbols = ''.join([random.choice(['X', 'O']) for _ in range(length)])
 
         self.human = 0
         self.computer = 0
@@ -132,11 +126,14 @@ class Game:
 
                     self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
 
+                    self.update_points() # Lai rāda, cik katram punktu, vienmēr
+
                     # notīra ievades laukus
                     self.entry2.delete(0, tk.END)
                     self.entry3.delete(0, tk.END)
             else:
                 self.result_label.configure(text="error")
+            
 
             if self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'O' or self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'X':
 
@@ -147,6 +144,8 @@ class Game:
                     self.result_label.configure(text="New string: " + next_string)
 
                     self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
+
+                    self.update_points()
 
                     # notīra ievades laukus
                     self.entry2.delete(0, tk.END)
