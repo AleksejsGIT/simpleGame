@@ -55,22 +55,7 @@ class GameTree: #klase lai ģenerēt koku
         pass
 
 
-    # def minimax(self, node, depth, is_maximizing_player): #tas pilnība nokopēts no ai, vienkārši idejai
-    #     if depth == 0 or not node.children:
-    #         return node.heuristic_value
-    #
-    #     if is_maximizing_player:
-    #         max_eval = float('-inf')
-    #         for child in node.children:
-    #             eval = self.minimax(child, depth - 1, False)
-    #             max_eval = max(max_eval, eval)
-    #         return max_eval
-    #     else:
-    #         min_eval = float('inf')
-    #         for child in node.children:
-    #             eval = self.minimax(child, depth - 1, True)
-    #             min_eval = min(min_eval, eval)
-    #         return min_eval
+    
 
 class Game:
 
@@ -84,6 +69,33 @@ class Game:
         self.root.title("13.komandas spēle")
         self.root.geometry("500x800")
         self.root.configure(bg="#B5C2B7")
+
+        self.label_computer = tk.Label(self.root, text="Choose the first player")
+        self.label_computer.configure(bg="#B5C2B7")
+        self.label_computer.pack()
+
+        self.button_computer = tk.Button(self.root, text="Computer") #japievieno funkcija, kuru pildit nospiezot pogu
+        self.button_computer.configure(bg="#2D2327", fg="#B5C2B7")
+        self.button_computer.pack()
+
+        self.button_human = tk.Button(self.root, text="Human") #japievieno funkcija, kuru pildit nospiezot pogu
+        self.button_human.configure(bg="#2D2327", fg="#B5C2B7")
+        self.button_human.pack()
+
+
+        self.label_choose = tk.Label(self.root, text="Choose the algorithm")
+        self.label_choose.configure(bg="#B5C2B7")
+        self.label_choose.pack()
+
+        self.button_choose_minmax = tk.Button(self.root, text="Minimax", command = self.minimax) 
+        self.button_choose_minmax.configure(bg="#2D2327", fg="#B5C2B7")
+        self.button_choose_minmax.pack()
+
+        self.button_choose_alfabeta = tk.Button(self.root, text="Alfa-Beta", command = self.alfabeta) 
+        self.button_choose_alfabeta.configure(bg="#2D2327", fg="#B5C2B7")
+        self.button_choose_alfabeta.pack()
+
+
         self.entry = tk.Entry(self.root)
         self.entry.pack(pady=40)
         self.input_label = tk.Label(self.root, text="Enter a number between 15 and 25:")
@@ -106,6 +118,30 @@ class Game:
 
         # papildus ievade gājieniem tad, ja sanāk ģenerēt virkni
         self.papildus_lauki = []
+
+
+    # def minimax(self, node, depth, is_maximizing_player): #tas pilnība nokopēts no ai, vienkārši idejai
+    #     if depth == 0 or not node.children:
+    #         return node.heuristic_value
+    #
+    #     if is_maximizing_player:
+    #         max_eval = float('-inf')
+    #         for child in node.children:
+    #             eval = self.minimax(child, depth - 1, False)
+    #             max_eval = max(max_eval, eval)
+    #         return max_eval
+    #     else:
+    #         min_eval = float('inf')
+    #         for child in node.children:
+    #             eval = self.minimax(child, depth - 1, True)
+    #             min_eval = min(min_eval, eval)
+    #         return min_eval
+
+    def minimax(self): #minimax algoritms
+        pass
+
+    def alfabeta(self): #alfa beta algoritms
+        pass
 
 
 
@@ -256,4 +292,3 @@ def print_tree(node, depth=0):#izprintē koku (izprintē pēc kārtas katru iesp
 
 game = Game(20)
 game.play()
-
