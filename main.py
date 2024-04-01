@@ -1,37 +1,41 @@
 import tkinter as tk
 import random
 
-# Vajag 1) lai koks ģenerētos līdz noteikajam līmenim un pielietot heiristisko funkciju kokam, 2)heiristiska funkcija, 3)algoritmus minimax un alfa_beta, 4)uzprogrammēt datora gājienus 
-#5)vēlams kaut kadā veidā koku izprintēt lai parliecināties ka viss pareizi
+# Vajag 1)heiristiska funkcija, 2)algoritmus minimax un alfa_beta
+# 3)padomāt par to, ka ģenerēt koku pa daļām, jo tagad var ģenerēt gan pilnu koku, gan daļu(mainot 98. rindā parametru depth, 
+# kad veidojas objekts)
+# 4)nezinu vai ir labi izmantot vienkārši masīvus koka glabāšanai, varbūt būtu labāk izmantot citas struktūras(vārdnīcu piemēram), 
+# bet to vajag skatīties kad būs algoritmi, un ar kuru struktūru būs ērtāk strādāt 
+# lai saprast kā tas viss strādā var palaist kodu un mēģināt uz papīra izveidot koku ta ka to dara dators
 
 class Node: #klase lai izveidot koka elementu (root, child)
     def __init__(self, state, is_max):
-        self.state = state
-        self.is_max = is_max
+        self.state = state #state būtībā ir char masīvs no simbolu virknes
+        self.is_max = is_max #kad veidojam node padodam True/False(speletājs ir maksimizētājs vai ne)
         self.children = []
 
 
 class GameTree: #klase lai ģenerēt koku
-    def __init__(self, root_state, depth, is_first=True): #konstruktors, kas veido GameTree objektus,
-        # root_state - sākuma simbolu virkne, is_first=True nozime ka pirmais ir speletajs ar 0
+    def __init__(self, root_state, depth, is_first=False): #konstruktors, kas veido GameTree objektus,
+        # root_state - sākuma simbolu virkne
         self.nodes = []
         self.root = Node(root_state, True)#veido koka sakni, True nozime ka pirmais speletajs ir maksimizētajs
         self.nodes.append(self.root)
-        self.n_nodes = 1
-        self.n_levels = depth
-        self.turn = 0 if is_first else 1
-        self.make_children(self.root, depth, self.turn )# izsauc make_children lai izveidot nākamos koka līmeņus
-        self.n_levels = depth - self.n_levels + 1
-        self.n_leaves = self.set_leaf_heuristics()
-
+        self.turn = 0 #spēli uzsāk spēlētājs ar O
+        self.make_children(self.root, depth, self.turn) #izsaucam make_ch lai izveidot koku
+        print_tree(self.root, 0)
 
 
     def make_children(self, node, depth, turn):
-        if depth == 0: # nulles vietā liekam skaitli cik līmeņus gribam
+        print(depth) #depth parametrs katru līmeni samazinās
+        if depth == 0:
             return
-        for state in self.generate_possible_states(node.state, turn): #izsaucam generate_possible_states un cikls iet pa visiem iespējamiem stāvokļiem
-            child = Node(state, not node.is_max)
+        states=self.generate_possible_states(list(node.state), turn) #ļoti svarīga lieta, ka node.state jābūt list tipa
+        print(states,'all states')
+        for state in states:
+            child = Node(state, not node.is_max)# veidojam Node klases objektu
             node.children.append(child)
+            print(child.state,'child state')
             self.nodes.append(child)
             self.make_children(child, depth - 1, (turn + 1) % 2) # rekursīvi izsaucam make_children - (depth - 1) un arī mainam spēlētāju -  (turn + 1) % 2
 
@@ -42,25 +46,13 @@ class GameTree: #klase lai ģenerēt koku
         possible_states = []
         player_symbol = 'O' if turn % 2 == 0 else 'X'
         opponent_symbol = 'X' if turn % 2 == 0 else 'O'
-        print(player_symbol+" player")
-        print(opponent_symbol + " opponent")
+        print('\n'+ player_symbol+" player"+"   "+opponent_symbol + " opponent")
         for i in range(len(current_state) - 1):
             if current_state[i:i + 2] == [opponent_symbol, opponent_symbol] or current_state[i:i + 2] == [opponent_symbol, player_symbol]:
                 new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
                 possible_states.append(new_state)
         return possible_states
         pass
-
-    def set_leaf_heuristics(self):
-            leaf_nodes = [node for node in self.nodes if not node.children]
-            for leaf in leaf_nodes:
-                leaf.heuristic_value = self.evaluate_state(leaf.state)
-            return len(leaf_nodes)
-
-    def evaluate_state(self, state): #heiristiska funkcija
-
-            pass
-
 
 
     # def minimax(self, node, depth, is_maximizing_player): #tas pilnība nokopēts no ai, vienkārši idejai
@@ -124,10 +116,10 @@ class Game:
             # un vienmēr ģenerējās virkne ar 20 elementiem(izsaukums programmas beigās). Tagad ņem parametru no ievades
             self.result_label.config(text="Generated string: " + ''.join(self.symbols))
             self.symbols_array = list(self.symbols)
-            if not self.papildus_lauki and not self.game_tree: #if not self>game_tree nozimē to, ka ja vel nav koka(GameTree klases objekta, tad izveidot to)
+            if not self.papildus_lauki and not self.game_tree: #if not self game_tree nozimē to, ka ja vel nav koka(GameTree klases objekta, tad izveidot to)
                 self.create_fields_for_move()
-                self.game_tree = GameTree(self.symbols, 5, bool(self.turn))# veidojam GameTree objektu(koku)
-                self.print_pos_states()# printē iespējamos stāvokļus atkarībā no tā kāds spelētājs tagad spēlē un kāda tagad ir virkne
+                self.game_tree = GameTree(self.symbols, 3, self.turn)# veidojam GameTree objektu(koku) un padodam velamo dziļumu(3), rekursivā finkcijā depth samazināsies līdz 1
+                # self.print_pos_states()# printē iespējamos stāvokļus atkarībā no tā kāds spelētājs tagad spēlē un kāda tagad ir virkne
         else:
             self.result_label.config(text="Number must be between 15 and 25.")
 
@@ -235,7 +227,7 @@ class Game:
         else:
             self.result_label.configure(text="error")
         self.turn = (self.turn + 1) % 2 #mainam spēlētāju
-        self.print_pos_states()
+        #self.print_pos_states()
 
 
 
@@ -257,7 +249,10 @@ class Game:
            print(state)
 
 
-
+def print_tree(node, depth=0):#izprintē koku (izprintē pēc kārtas katru iespējamo stāvokli ko var iegūt no saknes un tās pēctečus)
+    print("  " * depth + str(node.state))
+    for child in node.children:
+        print_tree(child, depth + 1)
 
 game = Game(20)
 game.play()
