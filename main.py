@@ -107,6 +107,10 @@ class Game:
         self.result_label.configure(bg="#B5C2B7")
         self.result_label.pack()
 
+        self.error_label = tk.Label(self.root, text="", font=("Arial", 14))
+        self.error_label.configure(bg="#B5C2B7")
+        self.error_label.pack()
+
         self.human_label = tk.Label(self.root, text="Human has " + str(self.human) + " points")
         self.human_label.configure(bg="#B5C2B7")
         self.human_label.pack()
@@ -145,8 +149,12 @@ class Game:
 
 
     def generate_and_display(self):
-        length = int(self.entry.get())
-        if 0 <= length <= 25:
+        try:
+            length = int(self.entry.get())
+        except ValueError:
+            self.result_label.config(text="You must enter an integer!")
+            return
+        if 15 <= length <= 25:
             self.symbols = ''.join([random.choice(['X', 'O']) for _ in range(length)]) #tagad virkne generējas šeit, jo iepriekšēja vietā length parametrs nemainījās
             # un vienmēr ģenerējās virkne ar 20 elementiem(izsaukums programmas beigās). Tagad ņem parametru no ievades
             self.result_label.config(text="Generated string: " + ''.join(self.symbols))
@@ -184,6 +192,7 @@ class Game:
 
     def points_result(self, kartas_nr1, kartas_nr2):
         # Pārbaudīt, vai gājiens ir derīgs
+        
         if kartas_nr1 == kartas_nr2:
             return False
 
@@ -220,8 +229,16 @@ class Game:
         # kods, kas aizvietos divus elementus
         # parveido ievadito par skaitli un -1, jo masīvā elementi sākas no 0
 
-        kartas_nr1 = int(self.entry2.get()) - 1
-        kartas_nr2 = int(self.entry3.get()) - 1
+        try:
+            kartas_nr1 = int(self.entry2.get()) - 1
+            kartas_nr2 = int(self.entry3.get()) - 1
+        except ValueError:
+            self.error_label.config(text="You must enter an integer!")
+            return
+
+        if kartas_nr1 == kartas_nr2:
+            self.error_label.config(text="Error, can't change the elements!")
+            return
 
         if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array) and kartas_nr2 >= 0 and kartas_nr2 < len(self.symbols_array) and abs(kartas_nr1 - kartas_nr2) == 1:
             if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X' or self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O':
@@ -235,6 +252,7 @@ class Game:
                 self.result_label.configure(text="New string: " + next_string)
 
                 self.update_points()  # Lai rāda, cik katram punktu, vienmēr
+                self.clear_error_message()
 
                 # notīra ievades laukus
                 self.entry2.delete(0, tk.END)
@@ -253,16 +271,24 @@ class Game:
                 self.result_label.configure(text="New string: " + next_string)
 
                 self.update_points()
+                self.clear_error_message()
 
                 # notīra ievades laukus
                 self.entry2.delete(0, tk.END)
                 self.entry3.delete(0, tk.END)
+    
             else:
-                self.result_label.configure(text="error")
+                self.error_label.configure(text="error")
         else:
-            self.result_label.configure(text="error")
+            self.error_label.configure(text="error")
         self.turn = (self.turn + 1) % 2 #mainam spēlētāju
         #self.print_pos_states()
+
+
+    def clear_error_message(self):
+        self.error_label.config(text="")
+
+   
 
     def is_over(self):
         # Pārbaude vai spēle ir beigusies
