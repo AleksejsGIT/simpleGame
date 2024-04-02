@@ -74,24 +74,23 @@ class Game:
         self.label_computer.configure(bg="#B5C2B7")
         self.label_computer.pack()
 
-        self.button_computer = tk.Button(self.root, text="Computer") #japievieno funkcija, kuru pildit nospiezot pogu
+        self.button_computer = tk.Button(self.root, text="Computer", command=self.set_computer_first)
         self.button_computer.configure(bg="#2D2327", fg="#B5C2B7")
         self.button_computer.pack()
 
-        self.button_human = tk.Button(self.root, text="Human") #japievieno funkcija, kuru pildit nospiezot pogu
+        self.button_human = tk.Button(self.root, text="Human", command=self.set_player_first)
         self.button_human.configure(bg="#2D2327", fg="#B5C2B7")
         self.button_human.pack()
-
 
         self.label_choose = tk.Label(self.root, text="Choose the algorithm")
         self.label_choose.configure(bg="#B5C2B7")
         self.label_choose.pack()
 
-        self.button_choose_minmax = tk.Button(self.root, text="Minimax", command = self.minimax) 
+        self.button_choose_minmax = tk.Button(self.root, text="Minimax", command=self.select_minimax)
         self.button_choose_minmax.configure(bg="#2D2327", fg="#B5C2B7")
         self.button_choose_minmax.pack()
 
-        self.button_choose_alfabeta = tk.Button(self.root, text="Alfa-Beta", command = self.alfabeta) 
+        self.button_choose_alfabeta = tk.Button(self.root, text="Alfa-Beta", command=self.select_alfabeta)
         self.button_choose_alfabeta.configure(bg="#2D2327", fg="#B5C2B7")
         self.button_choose_alfabeta.pack()
 
@@ -265,9 +264,6 @@ class Game:
         self.turn = (self.turn + 1) % 2 #mainam spēlētāju
         #self.print_pos_states()
 
-
-
-
     def is_over(self):
         # Pārbaude vai spēle ir beigusies
         return len(self.symbols) <= 2
@@ -283,6 +279,25 @@ class Game:
         possible_states = self.game_tree.generate_possible_states(self.symbols_array, self.game_tree.turn)
         for state in possible_states:
            print(state)
+
+
+# Nākamās 4 funkcijas ir izveidotas, lai saprastu, kurš spēlētājs/algoritms ir izvēlēts
+# Vienkārši samainīts brackground pogai, atkarībā no izvēles
+    def set_player_first(self):
+        self.button_human.config(state="disabled", bg="#A9A9A9")  
+        self.button_computer.config(state="normal", bg="#2D2327")  
+
+    def set_computer_first(self):
+        self.button_computer.config(state="disabled", bg="#A9A9A9") 
+        self.button_human.config(state="normal", bg="#2D2327") 
+
+    def select_minimax(self):
+        self.button_choose_minmax.config(state="disabled", bg="#A9A9A9")
+        self.button_choose_alfabeta.config(state="normal", bg="#2D2327") 
+
+    def select_alfabeta(self):
+        self.button_choose_alfabeta.config(state="disabled", bg="#A9A9A9") 
+        self.button_choose_minmax.config(state="normal", bg="#2D2327")
 
 
 def print_tree(node, depth=0):#izprintē koku (izprintē pēc kārtas katru iespējamo stāvokli ko var iegūt no saknes un tās pēctečus)
