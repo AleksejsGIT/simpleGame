@@ -55,6 +55,74 @@ class GameTree: #klase lai ģenerēt koku
         pass
 
 
+    
+
+class Game:
+
+    def __init__(self, length):
+        self.game_tree = None
+        self.turn = 0
+        self.human = 0
+        self.computer = 0
+
+        self.root = tk.Tk()
+        self.root.title("13.komandas spēle")
+        self.root.geometry("500x800")
+        self.root.configure(bg="#B5C2B7")
+
+        self.label_computer = tk.Label(self.root, text="Choose the first player")
+        self.label_computer.configure(bg="#B5C2B7")
+        self.label_computer.pack()
+
+        self.button_computer = tk.Button(self.root, text="Computer", command=self.set_computer_first)
+        self.button_computer.configure(bg="#2D2327", fg="#B5C2B7")
+        self.button_computer.pack()
+
+        self.button_human = tk.Button(self.root, text="Human", command=self.set_player_first)
+        self.button_human.configure(bg="#2D2327", fg="#B5C2B7")
+        self.button_human.pack()
+
+        self.label_choose = tk.Label(self.root, text="Choose the algorithm")
+        self.label_choose.configure(bg="#B5C2B7")
+        self.label_choose.pack()
+
+        self.button_choose_minmax = tk.Button(self.root, text="Minimax", command=self.select_minimax)
+        self.button_choose_minmax.configure(bg="#2D2327", fg="#B5C2B7")
+        self.button_choose_minmax.pack()
+
+        self.button_choose_alfabeta = tk.Button(self.root, text="Alfa-Beta", command=self.select_alfabeta)
+        self.button_choose_alfabeta.configure(bg="#2D2327", fg="#B5C2B7")
+        self.button_choose_alfabeta.pack()
+
+
+        self.entry = tk.Entry(self.root)
+        self.entry.pack(pady=40)
+        self.input_label = tk.Label(self.root, text="Enter a number between 15 and 25:")
+        self.input_label.configure(bg="#B5C2B7")
+        self.input_label.pack()
+        self.generate_button = tk.Button(self.root, text="Generate", command=self.generate_and_display)
+        self.generate_button.configure(bg="#2D2327", fg="#B5C2B7")
+        self.generate_button.pack()
+        self.result_label = tk.Label(self.root, text="", font=("Arial", 14))
+        self.result_label.configure(bg="#B5C2B7")
+        self.result_label.pack()
+
+        self.error_label = tk.Label(self.root, text="", font=("Arial", 14))
+        self.error_label.configure(bg="#B5C2B7")
+        self.error_label.pack()
+
+        self.human_label = tk.Label(self.root, text="Human has " + str(self.human) + " points")
+        self.human_label.configure(bg="#B5C2B7")
+        self.human_label.pack()
+
+        self.computer_label = tk.Label(self.root, text="Computer has " + str(self.computer) + " points")
+        self.computer_label.configure(bg="#B5C2B7")
+        self.computer_label.pack()
+
+        # papildus ievade gājieniem tad, ja sanāk ģenerēt virkni
+        self.papildus_lauki = []
+
+
     # def minimax(self, node, depth, is_maximizing_player): #tas pilnība nokopēts no ai, vienkārši idejai
     #     if depth == 0 or not node.children:
     #         return node.heuristic_value
@@ -72,46 +140,21 @@ class GameTree: #klase lai ģenerēt koku
     #             min_eval = min(min_eval, eval)
     #         return min_eval
 
-class Game:
+    def minimax(self): #minimax algoritms
+        pass
 
-    def __init__(self, length):
-        self.game_tree = None
-        self.turn = 0
-        self.human = 0
-        self.computer = 0
-
-        self.root = tk.Tk()
-        self.root.title("13.komandas spēle")
-        self.root.geometry("500x800")
-        self.root.configure(bg="#B5C2B7")
-        self.entry = tk.Entry(self.root)
-        self.entry.pack(pady=40)
-        self.input_label = tk.Label(self.root, text="Enter a number between 15 and 25:")
-        self.input_label.configure(bg="#B5C2B7")
-        self.input_label.pack()
-        self.generate_button = tk.Button(self.root, text="Generate", command=self.generate_and_display)
-        self.generate_button.configure(bg="#2D2327", fg="#B5C2B7")
-        self.generate_button.pack()
-        self.result_label = tk.Label(self.root, text="", font=("Arial", 14))
-        self.result_label.configure(bg="#B5C2B7")
-        self.result_label.pack()
-
-        self.human_label = tk.Label(self.root, text="Human has " + str(self.human) + " points")
-        self.human_label.configure(bg="#B5C2B7")
-        self.human_label.pack()
-
-        self.computer_label = tk.Label(self.root, text="Computer has " + str(self.computer) + " points")
-        self.computer_label.configure(bg="#B5C2B7")
-        self.computer_label.pack()
-
-        # papildus ievade gājieniem tad, ja sanāk ģenerēt virkni
-        self.papildus_lauki = []
+    def alfabeta(self): #alfa beta algoritms
+        pass
 
 
 
     def generate_and_display(self):
-        length = int(self.entry.get())
-        if 0 <= length <= 25:
+        try:
+            length = int(self.entry.get())
+        except ValueError:
+            self.result_label.config(text="You must enter an integer!")
+            return
+        if 15 <= length <= 25:
             self.symbols = ''.join([random.choice(['X', 'O']) for _ in range(length)]) #tagad virkne generējas šeit, jo iepriekšēja vietā length parametrs nemainījās
             # un vienmēr ģenerējās virkne ar 20 elementiem(izsaukums programmas beigās). Tagad ņem parametru no ievades
             self.result_label.config(text="Generated string: " + ''.join(self.symbols))
@@ -149,6 +192,7 @@ class Game:
 
     def points_result(self, kartas_nr1, kartas_nr2):
         # Pārbaudīt, vai gājiens ir derīgs
+        
         if kartas_nr1 == kartas_nr2:
             return False
 
@@ -185,8 +229,16 @@ class Game:
         # kods, kas aizvietos divus elementus
         # parveido ievadito par skaitli un -1, jo masīvā elementi sākas no 0
 
-        kartas_nr1 = int(self.entry2.get()) - 1
-        kartas_nr2 = int(self.entry3.get()) - 1
+        try:
+            kartas_nr1 = int(self.entry2.get()) - 1
+            kartas_nr2 = int(self.entry3.get()) - 1
+        except ValueError:
+            self.error_label.config(text="You must enter an integer!")
+            return
+
+        if kartas_nr1 == kartas_nr2:
+            self.error_label.config(text="Error, can't change the elements!")
+            return
 
         if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array) and kartas_nr2 >= 0 and kartas_nr2 < len(self.symbols_array) and abs(kartas_nr1 - kartas_nr2) == 1:
             if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X' or self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O':
@@ -200,6 +252,7 @@ class Game:
                 self.result_label.configure(text="New string: " + next_string)
 
                 self.update_points()  # Lai rāda, cik katram punktu, vienmēr
+                self.clear_error_message()
 
                 # notīra ievades laukus
                 self.entry2.delete(0, tk.END)
@@ -218,19 +271,24 @@ class Game:
                 self.result_label.configure(text="New string: " + next_string)
 
                 self.update_points()
+                self.clear_error_message()
 
                 # notīra ievades laukus
                 self.entry2.delete(0, tk.END)
                 self.entry3.delete(0, tk.END)
+    
             else:
-                self.result_label.configure(text="error")
+                self.error_label.configure(text="error")
         else:
-            self.result_label.configure(text="error")
+            self.error_label.configure(text="error")
         self.turn = (self.turn + 1) % 2 #mainam spēlētāju
         #self.print_pos_states()
 
 
+    def clear_error_message(self):
+        self.error_label.config(text="")
 
+   
 
     def is_over(self):
         # Pārbaude vai spēle ir beigusies
@@ -249,6 +307,25 @@ class Game:
            print(state)
 
 
+# Nākamās 4 funkcijas ir izveidotas, lai saprastu, kurš spēlētājs/algoritms ir izvēlēts
+# Vienkārši samainīts brackground pogai, atkarībā no izvēles
+    def set_player_first(self):
+        self.button_human.config(state="disabled", bg="#A9A9A9")  
+        self.button_computer.config(state="normal", bg="#2D2327")  
+
+    def set_computer_first(self):
+        self.button_computer.config(state="disabled", bg="#A9A9A9") 
+        self.button_human.config(state="normal", bg="#2D2327") 
+
+    def select_minimax(self):
+        self.button_choose_minmax.config(state="disabled", bg="#A9A9A9")
+        self.button_choose_alfabeta.config(state="normal", bg="#2D2327") 
+
+    def select_alfabeta(self):
+        self.button_choose_alfabeta.config(state="disabled", bg="#A9A9A9") 
+        self.button_choose_minmax.config(state="normal", bg="#2D2327")
+
+
 def print_tree(node, depth=0):#izprintē koku (izprintē pēc kārtas katru iespējamo stāvokli ko var iegūt no saknes un tās pēctečus)
     print("  " * depth + str(node.state))
     for child in node.children:
@@ -256,4 +333,3 @@ def print_tree(node, depth=0):#izprintē koku (izprintē pēc kārtas katru iesp
 
 game = Game(20)
 game.play()
-
