@@ -156,7 +156,7 @@ class Game:
 
         self.root = tk.Tk()
         self.root.title("13.komandas spēle")
-        self.root.geometry("500x800")
+        self.root.geometry("600x800")
         self.root.configure(bg="#B5C2B7")
 
         self.label_computer = tk.Label(self.root, text="Choose the first player")
@@ -227,7 +227,7 @@ class Game:
             # un vienmēr ģenerējās virkne ar 20 elementiem(izsaukums programmas beigās). Tagad ņem parametru no ievades
             self.result_label.config(text="Generated string: " + ''.join(self.symbols))
             self.symbols_array = Node(self.symbols, True, True,0)
-            # self.game_tree = GameTree(self.symbols, 3, self.turn)
+            # self.game_tree = GameTree(self.symbols, 3, self.turn) #3 norāda dziļumu
             if not self.papildus_lauki and not self.game_tree:
                 self.game_tree = GameTree(self.symbols, 3, self.turn)
                 self.create_fields_for_move()
@@ -364,8 +364,8 @@ class Game:
 
             self.symbols_array = best_move
             # Atjaunojiet esošo virkni ar jauno virkni
-            self.cm.config(text="cm with ch: " + ''.join(best_move.state))
-            self.pl.config(text=str(self.turn)+" 0-0, 1-x")
+            self.cm.config(text="Computer made a move: " + ''.join(best_move.state))
+            # self.pl.config(text=str(self.turn)+" 0-0, 1-x")
             # self.update_points()
         # self.calculate_computer_points(node,best_move)
         # print(self.game_tree.generate_possible_states(best_move.state,self.turn),"computer points ")
