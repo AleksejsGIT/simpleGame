@@ -202,6 +202,11 @@ class Game:
         self.computer_label.configure(text="Computer has " + str(self.computer) + " points")
 
     def generate_and_display(self, length):
+        try:
+            length = int(length)
+        except ValueError:
+            self.result_label.config(text="You must enter an integer!")
+            return
         
         if 0 <= length <= 25:
             self.symbols = ''.join([random.choice(['X', 'O']) for _ in range(
@@ -216,6 +221,9 @@ class Game:
                 self.current_player = True #comp
                 self.computer_move(True, self.game_tree.root, self.turn,self.current_player)
                  #computer
+         else:
+             self.result_label.config(text="Number must be between 15 and 25.")    
+    
 
 
     def create_fields_for_move(self):
@@ -304,6 +312,10 @@ class Game:
             kartas_nr2 = int(self.entry3.get()) - 1
         except ValueError:
             self.error_label.config(text="You must enter an integer!")
+            return
+        
+        if kartas_nr1 == kartas_nr2:
+            self.error_label.config(text="Error, can't change the elements!")
             return
         self.found_node = self.game_tree.find_node_by_state(self.game_tree.root, self.symbols_array.state)
         if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array.state) and kartas_nr2 >= 0 and kartas_nr2 < len(
