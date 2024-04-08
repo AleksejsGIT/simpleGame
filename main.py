@@ -370,7 +370,7 @@ class Game:
             else:
                 self.result_label.configure(text="error")
         else:
-            self.result_label.configure(text="error")
+            self.error_label.config(text="Error, can't change the elements!")
         self.turn = (self.turn + 1) % 2  # mainam spēlētāju
         print("human replaces_______________________________________________________________________________")
         self.update_points()
