@@ -178,6 +178,10 @@ class Game:
         self.result_label.configure(bg="#B5C2B7")
         self.result_label.pack()
 
+        self.error_label = tk.Label(self.root, text="", font=("Arial", 14))
+        self.error_label.configure(bg="#B5C2B7")
+        self.error_label.pack()
+
         self.cm = tk.Label(self.root, text="", font=("Arial", 14))
         self.cm.configure(bg="#B5C2B7")
         self.cm.pack()
@@ -198,7 +202,7 @@ class Game:
         self.computer_label.configure(text="Computer has " + str(self.computer) + " points")
 
     def generate_and_display(self, length):
-
+        
         if 0 <= length <= 25:
             self.symbols = ''.join([random.choice(['X', 'O']) for _ in range(
                 length)])  # tagad virkne generējas šeit, jo iepriekšēja vietā length parametrs nemainījās
@@ -295,8 +299,12 @@ class Game:
     def replace_elements(self):
         # kods, kas aizvietos divus elementus
         # parveido ievadito par skaitli un -1, jo masīvā elementi sākas no 0
-        kartas_nr1 = int(self.entry2.get()) - 1
-        kartas_nr2 = int(self.entry3.get()) - 1
+        try:
+            kartas_nr1 = int(self.entry2.get()) - 1
+            kartas_nr2 = int(self.entry3.get()) - 1
+        except ValueError:
+            self.error_label.config(text="You must enter an integer!")
+            return
         self.found_node = self.game_tree.find_node_by_state(self.game_tree.root, self.symbols_array.state)
         if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array.state) and kartas_nr2 >= 0 and kartas_nr2 < len(
                 self.symbols_array.state) and abs(kartas_nr1 - kartas_nr2) == 1:
@@ -308,6 +316,7 @@ class Game:
                 next_string = ''.join(self.symbols_array.state)
                 self.result_label.configure(text="New string: " + next_string)
                 self.update_points()  # Lai rāda, cik katram punktu, vienmēr
+                self.clear_error_message()
                 # notīra ievades laukus
                 self.entry2.delete(0, tk.END)
                 self.entry3.delete(0, tk.END)
@@ -332,6 +341,7 @@ class Game:
                 next_string = ''.join(self.symbols_array.state)
                 self.result_label.configure(text="New string: " + next_string)
                 self.update_points()
+                self.clear_error_message()
                 # notīra ievades laukus
                 self.entry2.delete(0, tk.END)
                 self.entry3.delete(0, tk.END)
@@ -403,6 +413,9 @@ class Game:
         # print("  " * depth + f"State: {node.state}, Heuristic value: {heuristic_value}")
         for child in node.children:
             self.print_tree(child, depth + 1)
+
+    def clear_error_message(self):
+        self.error_label.config(text="")
 
 
 
