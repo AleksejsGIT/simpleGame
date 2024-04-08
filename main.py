@@ -57,7 +57,7 @@ class GameTree:  # klase lai ģenerēt koku
                 if current_state[i:i + 2] == [opponent_symbol, player_symbol]:
                     new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
                     possible_states.append(new_state)
-                    self.human_points=1
+                    self.human_points -=1
                     print(new_state,self.computer_points)
                     self.arr_for_comp_points[''.join(new_state)]=self.human_points
 
@@ -92,7 +92,7 @@ class GameTree:  # klase lai ģenerēt koku
         if turn and current_player:  # player o 1 and its comp
             if list(node.state)[0] == 'O':
                 h_eval += 1
-            if game.human >= game.computer:
+            if game.computer >= game.human:
                 h_eval += 2
             return h_eval
 
@@ -241,9 +241,9 @@ class Game:
         if kartas_nr1 == kartas_nr2:
             return False
 
-        if self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'X':
+        if self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'O':
             self.human += 2
-        elif self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'O':
+        elif self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'X':
             self.computer -= 1
         self.update_points()
 
