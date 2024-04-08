@@ -47,19 +47,19 @@ class GameTree:  # klase lai ģenerēt koku
 
         for i in range(len(current_state) - 1):
 
-                if current_state[i:i + 2] == [opponent_symbol, opponent_symbol]:
-                    new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
-                    possible_states.append(new_state)
-                    self.computer_points = 2
-                    print(new_state, self.computer_points)
-                    self.arr_for_comp_points[''.join(new_state)]=self.computer_points
+            if current_state[i:i + 2] == [opponent_symbol, opponent_symbol]:
+                new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
+                possible_states.append(new_state)
+                self.computer_points = 2
+                print(new_state, self.computer_points)
+                self.arr_for_comp_points[''.join(new_state)]=self.computer_points
 
-                if current_state[i:i + 2] == [opponent_symbol, player_symbol]:
-                    new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
-                    possible_states.append(new_state)
-                    self.human_points = -1
-                    print(new_state,self.computer_points)
-                    self.arr_for_comp_points[''.join(new_state)]=self.human_points
+            if current_state[i:i + 2] == [opponent_symbol, player_symbol]:
+                new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
+                possible_states.append(new_state)
+                self.human_points = -1
+                print(new_state,self.computer_points)
+                self.arr_for_comp_points[''.join(new_state)]=self.human_points
 
         return possible_states
 
@@ -221,8 +221,8 @@ class Game:
                 self.current_player = True #comp
                 self.computer_move(True, self.game_tree.root, self.turn,self.current_player)
                  #computer
-         else:
-             self.result_label.config(text="Number must be between 15 and 25.")    
+        else:
+            self.result_label.config(text="Number must be between 15 and 25.")    
     
 
 
