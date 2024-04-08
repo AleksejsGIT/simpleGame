@@ -208,7 +208,7 @@ class Game:
             self.result_label.config(text="You must enter an integer!")
             return
         
-        if 0 <= length <= 25:
+        if 15 <= length <= 25:
             self.symbols = ''.join([random.choice(['X', 'O']) for _ in range(
                 length)])  # tagad virkne generējas šeit, jo iepriekšēja vietā length parametrs nemainījās
             # un vienmēr ģenerējās virkne ar 20 elementiem(izsaukums programmas beigās). Tagad ņem parametru no ievades
