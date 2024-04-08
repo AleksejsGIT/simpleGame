@@ -1,69 +1,158 @@
 import tkinter as tk
 import random
+#mainīt virknes garumu - 478 rinda
+class Node:  # klase lai izveidot koka elementu (root, child)
+    def __init__(self, state, is_max, player_symbol,depth):#,comp_points
 
-# Vajag 1)heiristiska funkcija, 2)algoritmus minimax un alfa_beta
-# 3)padomāt par to, ka ģenerēt koku pa daļām, jo tagad var ģenerēt gan pilnu koku, gan daļu(mainot 98. rindā parametru depth, 
-# kad veidojas objekts)
-# 4)nezinu vai ir labi izmantot vienkārši masīvus koka glabāšanai, varbūt būtu labāk izmantot citas struktūras(vārdnīcu piemēram), 
-# bet to vajag skatīties kad būs algoritmi, un ar kuru struktūru būs ērtāk strādāt 
-# lai saprast kā tas viss strādā var palaist kodu un mēģināt uz papīra izveidot koku ta ka to dara dators
-
-class Node: #klase lai izveidot koka elementu (root, child)
-    def __init__(self, state, is_max):
-        self.state = state #state būtībā ir char masīvs no simbolu virknes
-        self.is_max = is_max #kad veidojam node padodam True/False(speletājs ir maksimizētājs vai ne)
+        self.player_symbol = player_symbol
+        self.state = state  # state būtībā ir char masīvs no simbolu virknes
+        self.is_max = is_max  # kad veidojam node padodam True/False(speletājs ir maksimizētājs vai ne)
         self.children = []
+        self.computer_points_n=None
+        self.depth=depth
 
-
-class GameTree: #klase lai ģenerēt koku
-    def __init__(self, root_state, depth, is_first=False): #konstruktors, kas veido GameTree objektus,
-        # root_state - sākuma simbolu virkne
+class GameTree:  # klase lai ģenerēt koku
+    def __init__(self, root_state, depth, player):  # konstruktors, kas veido GameTree objektus, # root_state - sākuma simbolu virkne
+        self.computer_points = 0
+        self.human_points = 0
+        self.arr_for_comp_points={}
         self.nodes = []
-        self.root = Node(root_state, True)#veido koka sakni, True nozime ka pirmais speletajs ir maksimizētajs
+        self.root = Node(root_state, True, False,depth)  # veido koka sakni, True nozime ka pirmais speletajs ir maksimizētajs
         self.nodes.append(self.root)
-        self.turn = 0 #spēli uzsāk spēlētājs ar O
-        self.make_children(self.root, depth, self.turn) #izsaucam make_ch lai izveidot koku
-        print_tree(self.root, 0)
+        self.turn = 0  # spēli uzsāk spēlētājs ar O
+        self.player = player
+        self.make_children(self.root, depth, self.turn)  # izsaucam make_ch lai izveidot koku
+        game.print_tree(self.root, 0)
 
 
     def make_children(self, node, depth, turn):
-        print(depth) #depth parametrs katru līmeni samazinās
+        # print(depth)  # depth parametrs katru līmeni samazinās
         if depth == 0:
             return
-        states=self.generate_possible_states(list(node.state), turn) #ļoti svarīga lieta, ka node.state jābūt list tipa
-        print(states,'all states')
+        states = self.generate_possible_states(list(node.state), turn)
         for state in states:
-            child = Node(state, not node.is_max)# veidojam Node klases objektu
+            child = Node(list(state), not node.is_max, not node.player_symbol,depth)  # veidojam Node klases objektu
+            # if node.player_symbol:
+            #     print('x')
+            # else:
+            #     print('o')
+            # print(child.state,"child state")
             node.children.append(child)
-            print(child.state,'child state')
-            self.nodes.append(child)
-            self.make_children(child, depth - 1, (turn + 1) % 2) # rekursīvi izsaucam make_children - (depth - 1) un arī mainam spēlētāju -  (turn + 1) % 2
+            child.player_symbol = not node.player_symbol
+            self.make_children(child, depth - 1, (turn + 1) % 2)  # rekursīvi izsaucam make_children - (depth - 1) un arī mainam spēlētāju -  (turn + 1) % 2
 
-    def update_turn(self, turn): #metodi izmantojam lai padot uz  print_pos_states aktuālo spelētāju
+
+    def update_turn(self, turn):  # metodi izmantojam lai padot uz  print_pos_states aktuālo spelētāju
         self.turn = turn
 
-    def generate_possible_states(self, current_state, turn): #metode ģenerē visus iespējamos stāvokļus no dotas virknes atkarībā no spelētāja
+    def generate_possible_states(self, current_state, turn):  # metode ģenerē visus iespējamos stāvokļus no dotas virknes atkarībā no spelētāja
         possible_states = []
         player_symbol = 'O' if turn % 2 == 0 else 'X'
         opponent_symbol = 'X' if turn % 2 == 0 else 'O'
-        print('\n'+ player_symbol+" player"+"   "+opponent_symbol + " opponent")
+        # print('\n' + player_symbol + " player" + "   " + opponent_symbol + " opponent")
         for i in range(len(current_state) - 1):
-            if current_state[i:i + 2] == [opponent_symbol, opponent_symbol] or current_state[i:i + 2] == [opponent_symbol, player_symbol]:
-                new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
-                possible_states.append(new_state)
+            # if current_state[i:i + 2] == [opponent_symbol, opponent_symbol] or current_state[i:i + 2] == [
+            #     opponent_symbol, player_symbol]:
+            #     new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
+                if current_state[i:i + 2] == [opponent_symbol, opponent_symbol]:
+                    new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
+                    possible_states.append(new_state)
+                    self.computer_points = 2
+                    print(new_state, self.computer_points)
+                    self.arr_for_comp_points[''.join(new_state)]=self.computer_points
+
+                if current_state[i:i + 2] == [opponent_symbol, player_symbol]:
+                    new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
+                    possible_states.append(new_state)
+                    self.human_points=1
+                    print(new_state,self.computer_points)
+                    self.arr_for_comp_points[''.join(new_state)]=self.human_points
+
+        # print(possible_states,"possible states ")
         return possible_states
-        pass
+
+    ### minimax
+    def minimax(self, node, depth, is_max, turn,current_player):
+        # self.turn = (self.turn + 1) % 2
+        # print(node.children,'node.ch from minimax')
+        # for ch in node.children:
+        #     print(ch.state)
+        if depth == 0 or len(node.children) == 0:
+            return self.evaluate(node, turn,current_player)
+        for ch in node.children:
+            print(ch.state)
+            self.evaluate(ch,self.turn,current_player)
+            # print(self.evaluate(ch,self.turn,current_player),"evaluation",current_player)
+            # print(self.turn,"turn from minmax")
+            print(ch.state)
+
+        if is_max:
+            max_eval = float('-inf')
+            for child in node.children:
+                eval = self.minimax(child, depth - 1, False, turn,current_player)
+                max_eval = max(max_eval, eval)
+                # print(max_eval,"max_eval")
+            return max_eval
+        else:
+            min_eval = float('inf')
+            for child in node.children:
+                eval = self.minimax(child, depth - 1, True, turn,current_player)
+                min_eval = min(min_eval, eval)
+                # print(min_eval,"min_eval")
+            return min_eval
+
+    def evaluate(self, node, turn,current_player):
+        h_eval = 0
+        # self.turn = (self.turn + 1) % 2
+        print(turn, "pl_s")
+        if turn and current_player:  # player o 1 and its comp
+            if list(node.state)[0] == 'O':
+                h_eval += 1
+            # print(node.state,h_eval,"turn")
+            if game.human >= game.computer:
+                h_eval += 2
+            return h_eval
+
+        if not turn and current_player:  # player x and its comp
+            if list(node.state)[0] == 'X':
+                h_eval += 1
+            # print(node.state, h_eval, "not turn")
+            if game.human >= game.computer:
+                h_eval += 2
+            return h_eval
 
 
-    
+    def find_node_by_state(self, node, target_state):
+        # print(node.state, target_state,"+++++++++++++++++++++++++++")
+        if node is None:
+            return None
+
+        if str(node.state) == str(target_state):
+            return node
+
+        for child in node.children:
+            # print(node.state,target_state)
+            result = self.find_node_by_state(child, target_state)
+            if result:
+                return result
+
+        return None
+
+### minimax
+
 
 class Game:
 
     def __init__(self, length):
+
+        self.symbols_array = None
         self.game_tree = None
         self.turn = 0
         self.human = 0
         self.computer = 0
+        self.current_player=None
+        self.moves_count=0
+        self.found_node=None
 
         self.root = tk.Tk()
         self.root.title("13.komandas spēle")
@@ -79,6 +168,7 @@ class Game:
         self.button_computer.pack()
 
         self.button_human = tk.Button(self.root, text="Human", command=self.set_player_first)
+
         self.button_human.configure(bg="#2D2327", fg="#B5C2B7")
         self.button_human.pack()
 
@@ -94,23 +184,6 @@ class Game:
         self.button_choose_alfabeta.configure(bg="#2D2327", fg="#B5C2B7")
         self.button_choose_alfabeta.pack()
 
-
-        self.entry = tk.Entry(self.root)
-        self.entry.pack(pady=40)
-        self.input_label = tk.Label(self.root, text="Enter a number between 15 and 25:")
-        self.input_label.configure(bg="#B5C2B7")
-        self.input_label.pack()
-        self.generate_button = tk.Button(self.root, text="Generate", command=self.generate_and_display)
-        self.generate_button.configure(bg="#2D2327", fg="#B5C2B7")
-        self.generate_button.pack()
-        self.result_label = tk.Label(self.root, text="", font=("Arial", 14))
-        self.result_label.configure(bg="#B5C2B7")
-        self.result_label.pack()
-
-        self.error_label = tk.Label(self.root, text="", font=("Arial", 14))
-        self.error_label.configure(bg="#B5C2B7")
-        self.error_label.pack()
-
         self.human_label = tk.Label(self.root, text="Human has " + str(self.human) + " points")
         self.human_label.configure(bg="#B5C2B7")
         self.human_label.pack()
@@ -119,54 +192,51 @@ class Game:
         self.computer_label.configure(bg="#B5C2B7")
         self.computer_label.pack()
 
-        # papildus ievade gājieniem tad, ja sanāk ģenerēt virkni
+        self.generate_button = tk.Button(self.root, text="Generate", command=self.generate_handler)
+
+        self.generate_button.configure(bg="#2D2327", fg="#B5C2B7")
+        self.generate_button.pack()
+        self.result_label = tk.Label(self.root, text="", font=("Arial", 14))
+        self.result_label.configure(bg="#B5C2B7")
+        self.result_label.pack()
+
+        self.cm = tk.Label(self.root, text="", font=("Arial", 14))
+        self.cm.configure(bg="#B5C2B7")
+        self.cm.pack()
+
+        self.pl = tk.Label(self.root, text="", font=("Arial", 14))
+        self.pl.configure(bg="#B5C2B7")
+        self.pl.pack()
+
+        self.win = tk.Label(self.root, text="", font=("Arial", 14))
+        self.win.configure(bg="#B5C2B7")
+        self.win.pack()
+
         self.papildus_lauki = []
 
 
-    # def minimax(self, node, depth, is_maximizing_player): #tas pilnība nokopēts no ai, vienkārši idejai
-    #     if depth == 0 or not node.children:
-    #         return node.heuristic_value
-    #
-    #     if is_maximizing_player:
-    #         max_eval = float('-inf')
-    #         for child in node.children:
-    #             eval = self.minimax(child, depth - 1, False)
-    #             max_eval = max(max_eval, eval)
-    #         return max_eval
-    #     else:
-    #         min_eval = float('inf')
-    #         for child in node.children:
-    #             eval = self.minimax(child, depth - 1, True)
-    #             min_eval = min(min_eval, eval)
-    #         return min_eval
+    def update_points(self):
+        self.human_label.configure(text="Human has " + str(self.human) + " points")
+        self.computer_label.configure(text="Computer has " + str(self.computer) + " points")
 
-    def minimax(self): #minimax algoritms
-        pass
-
-    def alfabeta(self): #alfa beta algoritms
-        pass
-
-
-
-    def generate_and_display(self):
-        try:
-            length = int(self.entry.get())
-        except ValueError:
-            self.result_label.config(text="You must enter an integer!")
-            return
-        if 15 <= length <= 25:
-            self.symbols = ''.join([random.choice(['X', 'O']) for _ in range(length)]) #tagad virkne generējas šeit, jo iepriekšēja vietā length parametrs nemainījās
+    def generate_and_display(self, length):
+        # length = int(self.entry.get())
+        if 0 <= length <= 25:
+            self.symbols = ''.join([random.choice(['X', 'O']) for _ in range(
+                length)])  # tagad virkne generējas šeit, jo iepriekšēja vietā length parametrs nemainījās
             # un vienmēr ģenerējās virkne ar 20 elementiem(izsaukums programmas beigās). Tagad ņem parametru no ievades
             self.result_label.config(text="Generated string: " + ''.join(self.symbols))
-            self.symbols_array = list(self.symbols)
-            if not self.papildus_lauki and not self.game_tree: #if not self game_tree nozimē to, ka ja vel nav koka(GameTree klases objekta, tad izveidot to)
+            self.symbols_array = Node(self.symbols, True, True,0)
+            # self.game_tree = GameTree(self.symbols, 3, self.turn)
+            if not self.papildus_lauki and not self.game_tree:
+                self.game_tree = GameTree(self.symbols, 3, self.turn)
                 self.create_fields_for_move()
-                self.game_tree = GameTree(self.symbols, 3, self.turn)# veidojam GameTree objektu(koku) un padodam velamo dziļumu(3), rekursivā finkcijā depth samazināsies līdz 1
-                # self.print_pos_states()# printē iespējamos stāvokļus atkarībā no tā kāds spelētājs tagad spēlē un kāda tagad ir virkne
-        else:
-            self.result_label.config(text="Number must be between 15 and 25.")
+                self.current_player = True #comp
+                self.computer_move(True, self.game_tree.root, self.turn,self.current_player)
+                 #computer
 
-
+                # else:
+        #     self.result_label.config(text="Number must be between 15 and 25.")
 
     def create_fields_for_move(self):
         self.input_label2 = tk.Label(self.root, text="Enter the number of the first element")
@@ -192,144 +262,290 @@ class Game:
 
     def points_result(self, kartas_nr1, kartas_nr2):
         # Pārbaudīt, vai gājiens ir derīgs
-        
         if kartas_nr1 == kartas_nr2:
             return False
 
-        # Rēķināt punktus
-        if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X':
+        #
+        # if self.current_player:
+        #     # Rēķināt punktus
+        #     if self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'X':
+        #         self.computer += 2
+        #     elif self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'O':
+        #         self.human -= 1
+        #
+        #     elif self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'O':
+        #        self.human += 2
+        #     elif self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'X':
+        #         self.computer -= 1
+        #     self.update_points()
+        #
+        # if not self.current_player:
+        if self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'X':
             self.human += 2
-        elif self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O':
+        elif self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'O':
             self.computer -= 1
-        elif self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'O':
-            self.computer += 2
-        elif self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'X':
-            self.human -= 1
 
-            return True
+        # elif self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'O':
+        #     self.computer += 2
+        # elif self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'X':
+        #     self.human -= 1
+        self.update_points()
 
-    def update_points(self):
-        self.human_label.configure(text="Human has " + str(self.human) + " points")
-        self.computer_label.configure(text="Computer has " + str(self.computer) + " points")
-
-    def get_human_move(self, player):
-        # kods, kas iegūst gājienu no spēlētāja human(no grafiskas saskarnes)
-        pass
+            # elif self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'X':
+            #     self.human -= 1
+            #     return True
 
 
-    def computer_move(self):
-        # šeit uzprogrammēt datora gājeinu ar kādu no diviem algoritmiem
-        # šeit piemēram vienkārši ņemam random gājienu
-        possible_moves = self.game_tree.generate_possible_states(self.symbols_array, self.game_tree.turn)
-        computer_move = random.choice(possible_moves)
-        return computer_move
+    # def get_human_move(self, node, turn):
+    #     if not self.root:
+    #         return
+    #
+    #     self.input_label2 = tk.Label(self.root, text="Enter the number of the first element")
+    #     self.input_label2.configure(bg="#B5C2B7")
+    #     self.input_label2.pack()
+    #
+    #     self.entry2 = tk.Entry(self.root)
+    #     self.entry2.pack(pady=20)
+    #     self.papildus_lauki.append(self.entry2)
+    #
+    #     self.input_label3 = tk.Label(self.root, text="Enter the number of the second element")
+    #     self.input_label3.configure(bg="#B5C2B7")
+    #     self.input_label3.pack()
+    #
+    #     self.entry3 = tk.Entry(self.root)
+    #     self.entry3.pack(pady=20)
+    #     self.papildus_lauki.append(self.entry3)
+    #     self.button2 = tk.Button(self.root, text="Replace", command=self.replace_elements)
+    #     self.button2.configure(bg="#2D2327", fg="#B5C2B7")
+    #     self.button2.pack()
+    #     self.papildus_lauki.append(self.button2)
+    #
+    #     # self.computer_move(False, node, self.turn)
+    #     self.turn = (self.turn + 1) % 2
+    #     self.current_player=False
+    #
+    #     pass
+
+    #
+    def computer_move(self, is_max, node, turn,current_player):
+        # computer_points=node.computer_points_n
+        # print(node.state,"ns cm")
+        # print(node.children,"n ch")
+
+        for ch in node.children:
+            print(ch.state,"ch st")
+
+        best_move = None
+        if is_max:
+            best_score = float('-inf')  # Для максимизирующего игрока
+        else:
+            best_score = float('inf')  # Для минимизирующего игрока
+        if (len(node.children))==0 :#and len(node.state)==1
+            best_move=node
+            self.cm.config(text="cm no childrens: " + str(best_move.state))
+        else:
+
+            for child in node.children:
+                # print(child.state, 'move computermove')
+                score = self.game_tree.minimax(child, 3, False, turn,current_player)
+
+                # Если оценка лучше текущей лучшей оценки, обновляем лучший ход и его оценку
+                if is_max:
+                    if score > best_score:
+                        best_score = score
+                        best_move = child
+                        # print(best_move.state, "bm compmove")
+
+                else:
+                    if score < best_score:
+                        best_score = score
+                        best_move = child
+                        # print(best_move.state, "bm compmove")
+
+            self.symbols_array = best_move
+            # Atjaunojiet esošo virkni ar jauno virkni
+            self.cm.config(text="cm with ch: " + ''.join(best_move.state))
+            self.pl.config(text=str(self.turn)+" 0-0, 1-x")
+            # self.update_points()
+        # self.calculate_computer_points(node,best_move)
+        # print(self.game_tree.generate_possible_states(best_move.state,self.turn),"computer points ")
+        self.game_tree.generate_possible_states(node.state,self.turn)
+        # for state, points in self.game_tree.arr_for_comp_points.items():
+        #     print(''.join(state), ''.join(best_move.state),points,"st points")
+
+        for state,points in self.game_tree.arr_for_comp_points.items():
+            if ''.join(state)==''.join(best_move.state):
+                if points==1:
+                    self.human -= 1
+                else:
+                    self.computer+=2
+                # print(self.computer,"self.comp")
+        self.update_points()
+        self.turn = (self.turn + 1) % 2
+        return best_move
 
 
     def replace_elements(self):
         # kods, kas aizvietos divus elementus
         # parveido ievadito par skaitli un -1, jo masīvā elementi sākas no 0
-
-        try:
-            kartas_nr1 = int(self.entry2.get()) - 1
-            kartas_nr2 = int(self.entry3.get()) - 1
-        except ValueError:
-            self.error_label.config(text="You must enter an integer!")
-            return
-
-        if kartas_nr1 == kartas_nr2:
-            self.error_label.config(text="Error, can't change the elements!")
-            return
-
-        if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array) and kartas_nr2 >= 0 and kartas_nr2 < len(self.symbols_array) and abs(kartas_nr1 - kartas_nr2) == 1:
-            if self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'X' or self.symbols_array[kartas_nr1] == 'X' and self.symbols_array[kartas_nr2] == 'O':
-
+        kartas_nr1 = int(self.entry2.get()) - 1
+        kartas_nr2 = int(self.entry3.get()) - 1
+        self.found_node = self.game_tree.find_node_by_state(self.game_tree.root, self.symbols_array.state)
+        if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array.state) and kartas_nr2 >= 0 and kartas_nr2 < len(
+                self.symbols_array.state) and abs(kartas_nr1 - kartas_nr2) == 1:
+            if self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'X' or \
+                    self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'O':
                 self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
-
-                self.symbols_array[kartas_nr1] = 'O'
-                del self.symbols_array[kartas_nr2]
-
-                next_string = ''.join(self.symbols_array)
+                self.symbols_array.state[kartas_nr1] = 'O'
+                del self.symbols_array.state[kartas_nr2]
+                next_string = ''.join(self.symbols_array.state)
                 self.result_label.configure(text="New string: " + next_string)
-
                 self.update_points()  # Lai rāda, cik katram punktu, vienmēr
-                self.clear_error_message()
-
                 # notīra ievades laukus
                 self.entry2.delete(0, tk.END)
                 self.entry3.delete(0, tk.END)
+                # print(self.game_tree.root.children, 'root.children')
+                # print(self.symbols_array.state,
+                #       "--------------------------------------------------------------------------------")
+                # print(self.symbols_array.depth,
+                #       "---------------------------------------------------------------------------------------------!!!!!!!!!!!!")
+                if self.symbols_array.depth == 1:
+                    # self.game_tree.root = self.symbols_array.state
+
+                    self.found_node=self.game_tree.find_node_by_state(self.game_tree.root,self.symbols_array.state)
+                    # print(self.found_node,"++++++++++++++++++++++++")
+                    self.game_tree = GameTree(self.found_node.state, 3, self.turn)
+                    self.computer_move(True,self.found_node, self.turn, self.current_player)
+                    # print("if depth 1")
+                    self.update_points()
+                    return
+                #
+                # else:
+                #     print(self.found_node, "++++++++++++++++++++++++")
+                #     self.computer_move(True, self.found_node, self.turn,self.current_player)
+                #     print("else not 1")
+                self.computer_move(True, self.symbols_array, self.turn, self.current_player)
 
 
-
-            elif self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'O' or self.symbols_array[kartas_nr1] == 'O' and self.symbols_array[kartas_nr2] == 'X':
-
+            elif self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'O' or \
+                    self.symbols_array.state[kartas_nr1] == 'O' and self.symbols_array.state[kartas_nr2] == 'X':
                 self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
-
-                self.symbols_array[kartas_nr1] = 'X'
-                del self.symbols_array[kartas_nr2]
-
-                next_string = ''.join(self.symbols_array)
+                self.symbols_array.state[kartas_nr1] = 'X'
+                del self.symbols_array.state[kartas_nr2]
+                # new_root=Node(next_string)
+                next_string = ''.join(self.symbols_array.state)
                 self.result_label.configure(text="New string: " + next_string)
-
                 self.update_points()
-                self.clear_error_message()
-
                 # notīra ievades laukus
                 self.entry2.delete(0, tk.END)
                 self.entry3.delete(0, tk.END)
-    
+                # print(self.symbols_array.state,
+                #       "--------------------------------------------------------------------------------")
+                # print(self.symbols_array.depth,
+                #       "---------------------------------------------------------------------------------------------!!!!!!!!!!!!")
+                if self.symbols_array.depth == 1:
+                    # self.game_tree.root = self.symbols_array.state
+                    self.game_tree = GameTree(self.symbols_array.state, 3, self.turn)
+                    self.found_node=self.game_tree.find_node_by_state(self.game_tree.root,self.symbols_array.state)
+                    self.computer_move(True, self.found_node, self.turn, self.current_player)
+                    # print(self.found_node, "++++++++++++++++++++++++")
+                    # print("if depth 1")
+                    self.update_points()
+
+                    return
+                    #
+                # else:
+                #     print(self.found_node, "++++++++++++++++++++++++")
+                #     self.computer_move(True, self.found_node, self.turn,self.current_player)
+                #     print("else not 1")
+                self.computer_move(True, self.symbols_array, self.turn, self.current_player)
             else:
-                self.error_label.configure(text="error")
+                self.result_label.configure(text="error")
         else:
-            self.error_label.configure(text="error")
-        self.turn = (self.turn + 1) % 2 #mainam spēlētāju
-        #self.print_pos_states()
+            self.result_label.configure(text="error")
+        self.turn = (self.turn + 1) % 2  # mainam spēlētāju
+        print("human replaces_______________________________________________________________________________")
+        self.update_points()
+        # print(self.symbols_array.state,"sym arr from replace")
+        # print(self.game_tree.root.state)
+        self.computer_move(True, self.symbols_array, self.turn, self.current_player)
 
 
-    def clear_error_message(self):
-        self.error_label.config(text="")
+    def set_computer_first(self):
+        self.button_computer.config(state="disabled", bg="#A9A9A9")
+        self.button_human.config(state="normal", bg="#2D2327")
 
-   
+        self.generate_and_display(random.randint(5,6))
+        # self.computer_move(True, self.symbols_array, True)
+
+    def set_player_first(self):
+        self.button_human.config(state="disabled", bg="#A9A9A9")
+        self.button_computer.config(state="normal", bg="#2D2327")
+
+        entry_label = tk.Label(self.root, text="Enter a number between 15 and 25:")
+        entry_label.pack()
+
+        self.entry = tk.Entry(self.root)
+        self.entry.pack()
+
+    def generate_handler(self):
+        length = int(self.entry.get())
+        self.generate_and_display(length)
+
+    def human_handler(self):
+        # Показываем кнопку "Generate" только после выбора режима "Human"
+        self.generate_button.pack()
+
+    def select_minimax(self):
+        self.button_choose_minmax.config(state="disabled", bg="#A9A9A9")
+        self.button_choose_alfabeta.config(state="normal", bg="#2D2327")
+
+    def select_alfabeta(self):
+        self.button_choose_alfabeta.config(state="disabled", bg="#A9A9A9")
+        self.button_choose_minmax.config(state="normal", bg="#2D2327")
 
     def is_over(self):
         # Pārbaude vai spēle ir beigusies
-        return len(self.symbols) <= 2
-
+        return len(self.symbols) <= 1
 
     def play(self):
         # while not self.is_over(): ...
         self.root.mainloop()
 
-    def print_pos_states(self):
-        # šeit stradājam ar jau izveidoto generate_and_display metodē GameTree objektu(koku)
-        self.game_tree.update_turn(self.turn)
-        possible_states = self.game_tree.generate_possible_states(self.symbols_array, self.game_tree.turn)
-        for state in possible_states:
-           print(state)
+    # def print_pos_states(self):
+    #     # šeit stradājam ar jau izveidoto generate_and_display metodē GameTree objektu(koku)
+    #     self.game_tree.update_turn(self.turn)
+    #     possible_states = self.game_tree.generate_possible_states(self.symbols_array, self.game_tree.turn)
+    #     for state in possible_states:
+    #        print(state)
+
+    def print_tree(self, node,
+                   depth=0):  # izprintē koku (izprintē pēc kārtas katru iespējamo stāvokli ko var iegūt no saknes un tās pēctečus)
+        # heuristic_value = self.game_tree.evaluate(node)
+        print("  " * depth + str(node.state))
+        # print("  " * depth + f"State: {node.state}, Heuristic value: {heuristic_value}")
+        for child in node.children:
+            self.print_tree(child, depth + 1)
 
 
-# Nākamās 4 funkcijas ir izveidotas, lai saprastu, kurš spēlētājs/algoritms ir izvēlēts
-# Vienkārši samainīts brackground pogai, atkarībā no izvēles
-    def set_player_first(self):
-        self.button_human.config(state="disabled", bg="#A9A9A9")  
-        self.button_computer.config(state="normal", bg="#2D2327")  
-
-    def set_computer_first(self):
-        self.button_computer.config(state="disabled", bg="#A9A9A9") 
-        self.button_human.config(state="normal", bg="#2D2327") 
-
-    def select_minimax(self):
-        self.button_choose_minmax.config(state="disabled", bg="#A9A9A9")
-        self.button_choose_alfabeta.config(state="normal", bg="#2D2327") 
-
-    def select_alfabeta(self):
-        self.button_choose_alfabeta.config(state="disabled", bg="#A9A9A9") 
-        self.button_choose_minmax.config(state="normal", bg="#2D2327")
-
-
-def print_tree(node, depth=0):#izprintē koku (izprintē pēc kārtas katru iespējamo stāvokli ko var iegūt no saknes un tās pēctečus)
-    print("  " * depth + str(node.state))
-    for child in node.children:
-        print_tree(child, depth + 1)
 
 game = Game(20)
 game.play()
+# def main():
+#     # game = Game(20)
+#     # game.play()
+#
+#
+#     while not game.is_over():
+#         if game.turn == 0:  # Ход человека
+#             game.get_human_move(game.symbols_array)
+#             # Обновите состояние игры в соответствии с ходом человека
+#         else:  # Ход компьютера
+#             game.computer_move(True,game.symbols_array,game.turn)
+#             best_move = game.game_tree.get_best_move(game.game_tree.root, depth=3)
+#             print("Best move:", best_move)
+#
+#
+#
+# if __name__ == "__main__":
+#     main()
