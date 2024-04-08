@@ -57,7 +57,7 @@ class GameTree:  # klase lai ģenerēt koku
                 if current_state[i:i + 2] == [opponent_symbol, player_symbol]:
                     new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
                     possible_states.append(new_state)
-                    self.human_points -=1
+                    self.human_points = -1
                     print(new_state,self.computer_points)
                     self.arr_for_comp_points[''.join(new_state)]=self.human_points
 
@@ -283,7 +283,7 @@ class Game:
 
         for state,points in self.game_tree.arr_for_comp_points.items():
             if ''.join(state)==''.join(best_move.state):
-                if points==1:
+                if points==-1:
                     self.human -= 1
                 else:
                     self.computer+=2
