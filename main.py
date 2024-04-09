@@ -319,12 +319,12 @@ class Game:
             return
         self.found_node = self.game_tree.find_node_by_state(self.game_tree.root, self.symbols_array.state)
         if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array.state) and kartas_nr2 >= 0 and kartas_nr2 < len(
-                self.symbols_array.state) and abs(kartas_nr1 - kartas_nr2) == 1: #pārbauda vai elementi ir blakus
+                self.symbols_array.state) and abs(kartas_nr1 - kartas_nr2) == 1: #pārbauda vai elementi ir blakus un vai lielāks pa 0
             if self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'X' or \
                     self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'O':
                 self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
-                self.symbols_array.state[kartas_nr1] = 'O'
-                del self.symbols_array.state[kartas_nr2]
+                self.symbols_array.state[kartas_nr1] = 'O' # aizvieto elementu
+                del self.symbols_array.state[kartas_nr2] 
                 next_string = ''.join(self.symbols_array.state)
                 self.result_label.configure(text="New string: " + next_string)
                 self.update_points()  # Lai rāda, cik katram punktu, vienmēr
@@ -378,17 +378,17 @@ class Game:
         self.computer_move(True, self.symbols_array, self.turn, self.current_player)
 
 
-    def set_computer_first(self):
+    def set_computer_first(self): #nospiežot pogu computer iestata, ka dators sāks spēli
         self.button_computer.config(state="disabled", bg="#A9A9A9")
         self.button_human.config(state="normal", bg="#2D2327")
 
         self.generate_and_display(random.randint(15,25))
 
-    def set_player_first(self):
+    def set_player_first(self): #nospiežot pogu human iestata, ka cilvēks sāks spēli
         self.button_human.config(state="disabled", bg="#A9A9A9")
         self.button_computer.config(state="normal", bg="#2D2327")
 
-        entry_label = tk.Label(self.root, text="Enter a number between 15 and 25:")
+        entry_label = tk.Label(self.root, text="Enter a number between 15 and 25:") #izvada virknes garuma ievades lauku
         entry_label.pack()
 
         self.entry = tk.Entry(self.root)
@@ -402,7 +402,7 @@ class Game:
         # Показываем кнопку "Generate" только после выбора режима "Human"
         self.generate_button.pack()
 
-    def select_minimax(self):
+    def select_minimax(self): #pogas algoritma izvēlei
         self.button_choose_minmax.config(state="disabled", bg="#A9A9A9")
         self.button_choose_alfabeta.config(state="normal", bg="#2D2327")
 
@@ -419,7 +419,7 @@ class Game:
         self.root.mainloop()
 
     def print_tree(self, node,
-                   depth=0):  # izprintē koku (izprintē pēc kārtas katru iespējamo stāvokli ko var iegūt no saknes un tās pēctečus)
+                   depth=0):  # izprintē koku konsolē (izprintē pēc kārtas katru iespējamo stāvokli ko var iegūt no saknes un tās pēctečus)
         # heuristic_value = self.game_tree.evaluate(node)
         print("  " * depth + str(node.state))
         # print("  " * depth + f"State: {node.state}, Heuristic value: {heuristic_value}")
