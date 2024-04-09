@@ -1,6 +1,6 @@
 import tkinter as tk
 import random
-#mainīt virknes garumu - 366 rinda
+#mainīt virknes garumu - 384 rinda
 class Node:  # klase lai izveidot koka elementu (root, child)
     def __init__(self, state, is_max, player_symbol,depth):#,comp_points
 
@@ -372,7 +372,6 @@ class Game:
         else:
             self.error_label.config(text="Error, can't change the elements!")
         self.turn = (self.turn + 1) % 2  # mainam spēlētāju
-        print("human replaces_______________________________________________________________________________")
         self.update_points()
 
         self.computer_move(True, self.symbols_array, self.turn, self.current_player)
@@ -399,7 +398,7 @@ class Game:
         self.generate_and_display(length)
 
     def human_handler(self):
-        # Показываем кнопку "Generate" только после выбора режима "Human"
+        # Rādīt pogu "Ģenerēt" tikai pēc tam, kad ir izvēlēts režīms "Cilvēks".
         self.generate_button.pack()
 
     def select_minimax(self): #pogas algoritma izvēlei
@@ -422,7 +421,6 @@ class Game:
                    depth=0):  # izprintē koku konsolē (izprintē pēc kārtas katru iespējamo stāvokli ko var iegūt no saknes un tās pēctečus)
         # heuristic_value = self.game_tree.evaluate(node)
         print("  " * depth + str(node.state))
-        # print("  " * depth + f"State: {node.state}, Heuristic value: {heuristic_value}")
         for child in node.children:
             self.print_tree(child, depth + 1)
 
