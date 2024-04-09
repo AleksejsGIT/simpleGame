@@ -4,40 +4,40 @@ import random
 class Node:  # klase lai izveidot koka elementu (root, child)
     def __init__(self, state, is_max, player_symbol,depth):#,comp_points
 
-        self.player_symbol = player_symbol
+        self.player_symbol = player_symbol 
         self.state = state  # state būtībā ir char masīvs no simbolu virknes
         self.is_max = is_max  # kad veidojam node padodam True/False(speletājs ir maksimizētājs vai ne)
-        self.children = []
+        self.children = [] # saglabājam virsotnes nākamo līmeni
         self.computer_points_n=None
-        self.depth=depth
+        self.depth=depth 
 
 class GameTree:  # klase lai ģenerēt koku
     def __init__(self, root_state, depth, player):  # konstruktors, kas veido GameTree objektus, # root_state - sākuma simbolu virkne
         self.computer_points = 0
         self.human_points = 0
-        self.arr_for_comp_points={}
-        self.nodes = []
+        self.arr_for_comp_points={} #vārdnīca, glabājam datora iegūstamos punktus par gājienu
+        self.nodes = [] #visas virsotnes
         self.root = Node(root_state, True, False,depth)  # veido koka sakni, True nozime ka pirmais speletajs ir maksimizētajs
-        self.nodes.append(self.root)
+        self.nodes.append(self.root) #pievienojam kokam sakni
         self.turn = 0  # spēli uzsāk spēlētājs ar O
         self.player = player
         self.make_children(self.root, depth, self.turn)  # izsaucam make_ch lai izveidot koku
         game.print_tree(self.root, 0)
 
 
-    def make_children(self, node, depth, turn):
+    def make_children(self, node, depth, turn): #izveidojam virsotnes / koku
         # print(depth)  # depth parametrs katru līmeni samazinās
         if depth == 0:
             return
         states = self.generate_possible_states(list(node.state), turn)
-        for state in states:
+        for state in states: #katrā iterācijā dziļumu samazinam
             child = Node(list(state), not node.is_max, not node.player_symbol,depth)  # veidojam Node klases objektu
             node.children.append(child)
             child.player_symbol = not node.player_symbol
             self.make_children(child, depth - 1, (turn + 1) % 2)  # rekursīvi izsaucam make_children - (depth - 1) un arī mainam spēlētāju -  (turn + 1) % 2
 
 
-    def update_turn(self, turn):  # metodi izmantojam lai padot uz  print_pos_states aktuālo spelētāju
+    def update_turn(self, turn):  
         self.turn = turn
 
     def generate_possible_states(self, current_state, turn):  # metode ģenerē visus iespējamos stāvokļus no dotas virknes atkarībā no spelētāja
@@ -47,19 +47,19 @@ class GameTree:  # klase lai ģenerēt koku
 
         for i in range(len(current_state) - 1):
 
-            if current_state[i:i + 2] == [opponent_symbol, opponent_symbol]:
-                new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
+            if current_state[i:i + 2] == [opponent_symbol, opponent_symbol]: #izgriež no masīva daļu
+                new_state = current_state[:i] + [player_symbol] + current_state[i + 2:] #līdz i viss paliek, tālāk samaina elementus
                 possible_states.append(new_state)
-                self.computer_points = 2
+                self.computer_points = 2 #punkti vārdnīcai
                 print(new_state, self.computer_points)
                 self.arr_for_comp_points[''.join(new_state)]=self.computer_points
 
             if current_state[i:i + 2] == [opponent_symbol, player_symbol]:
                 new_state = current_state[:i] + [player_symbol] + current_state[i + 2:]
                 possible_states.append(new_state)
-                self.human_points = -1
+                self.human_points = -1 #punkti vārdnīcai
                 print(new_state,self.computer_points)
-                self.arr_for_comp_points[''.join(new_state)]=self.human_points
+                self.arr_for_comp_points[''.join(new_state)]=self.human_points #pievienojam
 
         return possible_states
 
@@ -73,8 +73,8 @@ class GameTree:  # klase lai ģenerēt koku
             self.evaluate(ch,self.turn,current_player)
             print(ch.state)
 
-        if is_max:
-            max_eval = float('-inf')
+        if is_max: 
+            max_eval = float('-inf') #vismazākais iespējamais skaitlis
             for child in node.children:
                 eval = self.minimax(child, depth - 1, False, turn,current_player)
                 max_eval = max(max_eval, eval)
@@ -86,13 +86,12 @@ class GameTree:  # klase lai ģenerēt koku
                 min_eval = min(min_eval, eval)
             return min_eval
 
-    def evaluate(self, node, turn,current_player):
+    def evaluate(self, node, turn,current_player): #nosakam labāko virsotni
         h_eval = 0
-        print(turn, "pl_s")
         if turn and current_player:  # player o 1 and its comp
-            if list(node.state)[0] == 'O':
+            if list(node.state)[0] == 'O': #ja pirmais elements O
                 h_eval += 1
-            if game.computer >= game.human:
+            if game.computer >= game.human: # ja datoram vairāk punktu nekā cilvēkam
                 h_eval += 2
             return h_eval
 
@@ -104,7 +103,7 @@ class GameTree:  # klase lai ģenerēt koku
             return h_eval
 
 
-    def find_node_by_state(self, node, target_state):
+    def find_node_by_state(self, node, target_state): 
 
         if node is None:
             return None
@@ -203,7 +202,7 @@ class Game:
 
     def generate_and_display(self, length):
         try:
-            length = int(length)
+            length = int(length) #parbauda vai ir skaitlis
         except ValueError:
             self.result_label.config(text="You must enter an integer!")
             return
@@ -216,8 +215,8 @@ class Game:
             self.symbols_array = Node(self.symbols, True, True,0)
             # self.game_tree = GameTree(self.symbols, 3, self.turn) #3 norāda dziļumu
             if not self.papildus_lauki and not self.game_tree:
-                self.game_tree = GameTree(self.symbols, 3, self.turn)
-                self.create_fields_for_move()
+                self.game_tree = GameTree(self.symbols, 3, self.turn) #3 norāda dziļumu
+                self.create_fields_for_move() #lai cilvēks var ievadīt vērtības
                 self.current_player = True #comp
                 self.computer_move(True, self.game_tree.root, self.turn,self.current_player)
                  #computer
@@ -261,23 +260,24 @@ class Game:
 
     def computer_move(self, is_max, node, turn,current_player):
 
-        for ch in node.children:
-            print(ch.state,"ch st")
+        #for ch in node.children:
+         #   print(ch.state,"ch st")
 
         best_move = None
         if is_max:
-            best_score = float('-inf')  # Для максимизирующего игрока
+            best_score = float('-inf')  # maksimizētājam
         else:
-            best_score = float('inf')  # Для минимизирующего игрока
-        if (len(node.children))==0 :#and len(node.state)==1
+            best_score = float('inf')  # minimizētājam
+        if (len(node.children))==0 : # kad beidzas children
             best_move=node
-            self.cm.config(text="cm no childrens: " + str(best_move.state))
+            self.cm.config(text="cm no childrens: " + ''.join(best_move.state))
         else:
 
             for child in node.children:
                 score = self.game_tree.minimax(child, 3, False, turn,current_player)
 
-                # Если оценка лучше текущей лучшей оценки, обновляем лучший ход и его оценку
+                # ja vērtējums labāks nekā esošais, tad atjaunot labāko gājienu un vērtējumu
+                
                 if is_max:
                     if score > best_score:
                         best_score = score
@@ -319,7 +319,7 @@ class Game:
             return
         self.found_node = self.game_tree.find_node_by_state(self.game_tree.root, self.symbols_array.state)
         if kartas_nr1 >= 0 and kartas_nr1 < len(self.symbols_array.state) and kartas_nr2 >= 0 and kartas_nr2 < len(
-                self.symbols_array.state) and abs(kartas_nr1 - kartas_nr2) == 1:
+                self.symbols_array.state) and abs(kartas_nr1 - kartas_nr2) == 1: #pārbauda vai elementi ir blakus
             if self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'X' or \
                     self.symbols_array.state[kartas_nr1] == 'X' and self.symbols_array.state[kartas_nr2] == 'O':
                 self.points_result(kartas_nr1, kartas_nr2)  # izsauc metodi, kas aprēķina spēlētāju punktus
