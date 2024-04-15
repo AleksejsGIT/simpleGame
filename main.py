@@ -89,14 +89,14 @@ class GameTree:  # klase lai ģenerēt koku
     def evaluate(self, node, turn,current_player): #nosakam labāko virsotni
         h_eval = 0
         if turn and current_player:  # player o 1 and its comp
-            if list(node.state)[0] == 'O': #ja pirmais elements O
+            if list(node.state)[0] == 'X': #ja pirmais elements O
                 h_eval += 1
             if game.computer >= game.human: # ja datoram vairāk punktu nekā cilvēkam
                 h_eval += 2
             return h_eval
 
         if not turn and current_player:  # player x and its comp
-            if list(node.state)[0] == 'X':
+            if list(node.state)[0] == 'O':
                 h_eval += 1
             if game.human >= game.computer:
                 h_eval += 2
